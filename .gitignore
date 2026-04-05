@@ -1,0 +1,11 @@
+# Virtual Environment
+myvenv/
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# Model and Imputer Files (Large binaries)
+*.pkl
+
+# Python Cache (Standard practice)
+__pycache__/
