@@ -6,11 +6,12 @@ import joblib
 app = FastAPI(title="Fuel Predictor Backend")
 
 # Agar model load na ho toh app start hi nahi hogi (silent fail nahi)
+
 try:
     model = joblib.load('fuel_consumption_modelv1.pkl')
     imputer = joblib.load('imputerv1.pkl')
     
-    # 🔍 SAFEGUARD: Model ke actual feature names yahan se milenge
+    # SAFEGUARD: Model ke actual feature names yahan se milenge
     # Agar model ke paas feature_names_in_ hai (sklearn >= 1.0), use karo
     if hasattr(model, 'feature_names_in_'):
         EXPECTED_COLUMNS = list(model.feature_names_in_)
