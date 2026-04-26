@@ -22,10 +22,11 @@ The model was trained and evaluated on a massive dataset of vehicle specificatio
 
 ## 🛠️ Tech Stack
 
-* **Language:** Python 3.x
+* **Language:** Python 3.12+
 * **ML Libraries:** Scikit-Learn (Random Forest, SimpleImputer), Pandas, Joblib
 * **Visualization & Notebook:** Jupyter Notebook, Matplotlib
-* **Deployment & UI:** Streamlit (Custom CSS, responsive grid layouts, dynamic state management)
+* **Backend API:** FastAPI, Uvicorn, Pydantic (Strict Data Validation)
+* **Frontend UI:** Streamlit (Custom CSS, responsive grid layouts, requests)
 
 ## 💻 Installation & Setup
 
