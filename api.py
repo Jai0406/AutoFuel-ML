@@ -10,7 +10,8 @@ try:
     imputer = joblib.load('imputerv1.pkl')
     
     # FIX: Model array pe train hua tha isliye usme naam nahi hain.
-    # Par IMPUTER dataframe pe train hua tha, toh hum imputer se columns nikalenge!
+    # Par IMPUTER dataframe pe train hua tha, toh hum imputer se columns nikalenge
+    
     if hasattr(imputer, 'feature_names_in_'):
         EXPECTED_COLUMNS = list(imputer.feature_names_in_)
         print(f"✅ Imputer loaded. Expected columns ({len(EXPECTED_COLUMNS)})")
@@ -69,7 +70,7 @@ def build_input_dict(data: VehicleData) -> dict:
         input_dict[ft_col] = True
     else:
         raise ValueError(
-            f"Fuel type '{data.ft}' ke liye koi column nahi mila. "
+            f"Fuel type '{data.ft}' has no information in data"
             f"Valid: petrol, diesel, electric, lpg, petrol/electric, diesel/electric, hydrogen, ng"
         )
     
@@ -82,9 +83,8 @@ def build_input_dict(data: VehicleData) -> dict:
         input_dict[fm_col] = True
     elif data.fm != 'B':
         raise ValueError(
-            f"Drive mode '{data.fm}' ke liye koi column nahi mila. Valid: M, E, P, H, F, B"
-        )
-    
+            f"Drive mode '{data.fm}' has no information in data. Valid: M, E, P, H, F, B")
+
     return input_dict
 
 
