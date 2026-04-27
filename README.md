@@ -47,14 +47,20 @@ source myvenv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the dashboard
-streamlit run app.py
+# Run the Application (Orchestrator)
+# This single command safely launches both the FastAPI backend and Streamlit frontend.
+python run.py
+
 
 ## 📂 Project Structure
 
 ### Jai_verma_Fuel_eff_pred.ipynb: The complete research workflow including Data Loading, EDA, Preprocessing (Imputation/Encoding), Random Forest training, and evaluation.
 
 ### app.py: The production-ready Streamlit application featuring the premium UI and backend prediction logic.
+
+### run.py: The Master Orchestrator script that safely launches and manages both the backend API and frontend UI processes, ensuring no port-clashing or freezes.
+
+### api.py: The robust FastAPI backend that handles data validation (Pydantic), loads the ML models, and serves the prediction endpoints.
 
 ### fuel_consumption_modelv1.pkl: The trained Random Forest model exported for deployment.
 

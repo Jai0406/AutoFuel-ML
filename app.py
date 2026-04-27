@@ -1,58 +1,13 @@
 import streamlit as st
 import requests
-import subprocess
-import time
 
 API_URL = "http://127.0.0.1:8000"
-
-def ensure_backend_is_running():
-    if st.session_state.get("backend_started"):
-        return
-
-    try:
-        r = requests.get(f"{API_URL}/health", timeout=1)
-        if r.status_code == 200:
-            st.session_state["backend_started"] = True
-            return
-    except requests.exceptions.ConnectionError:
-        pass
-
-    # Start 
-    with st.spinner("⏳ Backend server shuru ho raha hai..."):
-        proc = subprocess.Popen(
-            ["python", "-m", "uvicorn", "api:app",
-             "--host", "127.0.0.1", "--port", "8000"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-        st.session_state["backend_pid"] = proc.pid
-
-        # 15 second polling
-        for _ in range(15):
-            time.sleep(1)
-            try:
-                if requests.get(f"{API_URL}/health", timeout=1).status_code == 200:
-                    st.session_state["backend_started"] = True
-                    return
-            except requests.exceptions.ConnectionError:
-                continue
-
-    st.error(
-        "❌ Backend 15 seconds mein start nahi hua. "
-        "Manually run karo: `uvicorn api:app --host 127.0.0.1 --port 8000`"
-    )
-    st.stop()
-
-
-ensure_backend_is_running()
-
 
 st.set_page_config(
     page_title="Pro Fuel Predictor",
     page_icon="🏎️",
     layout="wide",
-    initial_sidebar_state="collapsed",
-)
+    initial_sidebar_state="collapsed",)
 
 st.markdown("""
 <style>
@@ -66,7 +21,6 @@ header    {visibility: hidden;}
     max-width: 95% !important;
 }
 
-/* Predict button */
 .stButton>button {
     background-color: #ff4b4b !important;
     color: white !important;
@@ -85,7 +39,6 @@ header    {visibility: hidden;}
     transform: translateY(-2px);
 }
 
-/* Result card */
 .prediction-card {
     background-color: #1e2130;
     padding: 30px 20px;
@@ -97,36 +50,23 @@ header    {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
+# ── Header ──
+st.markdown("<h2 style='text-align:left; margin-bottom:0; color:#ff4b4b;'>🏎️ Vehicle Fuel Predictor</h2>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:left; color:#9ca3af; font-size:1rem; margin-bottom:20px;'>Enter specs of your vehicle.</p>", unsafe_allow_html=True)
 
-# Header
-
-st.markdown(
-    "<h2 style='text-align:left; margin-bottom:0; color:#ff4b4b;'>🏎️ Vehicle Fuel Predictor</h2>",
-    unsafe_allow_html=True,
-)
-st.markdown(
-    "<p style='text-align:left; color:#9ca3af; font-size:1rem; margin-bottom:20px;'>"
-    "Enter specs of your vehicle.</p>",
-    unsafe_allow_html=True,
-)
-
-# Layout
-
+# ── Layout ──
 left_panel, right_panel = st.columns([1.8, 1], gap="large")
 
 with left_panel:
-    st.markdown(
-        "<h4 style='color:#e2e8f0; border-bottom:1px solid #3e4253; padding-bottom:10px;'>"
-        "Enter Vehicle Specifications</h4>",
-        unsafe_allow_html=True,
-    )
+    st.markdown("<h4 style='color:#e2e8f0; border-bottom:1px solid #3e4253; padding-bottom:10px;'>⚙️ Enter Vehicle Specifications</h4>", unsafe_allow_html=True)
     c1, c2 = st.columns(2, gap="medium")
 
     with c1:
-        ec    = st.number_input("Engine Capacity (cc)",    value=1400.0, step=100.0)
-        m_kg  = st.number_input("Vehicle Mass (kg)",       value=1600.0, step=50.0)
-        ewltp = st.number_input("CO2 Emissions (g/km)",    value=130.0,  step=10.0)
+        ec    = st.number_input("Engine Capacity (cc)",       value=1400.0, step=100.0)
+        m_kg  = st.number_input("Vehicle Mass (kg)",          value=1600.0, step=50.0)
+        ewltp = st.number_input("CO2 Emissions (g/km)",       value=130.0,  step=10.0)
 
+        # Restored full dictionary
         ft_map = {
             "Petrol":                   "petrol",
             "Diesel":                   "diesel",
@@ -141,10 +81,11 @@ with left_panel:
         ft = ft_map[ft_choice]
 
     with c2:
-        ep     = st.number_input("Engine Power (KW)",      value=110.0,  step=10.0)
-        mt     = st.number_input("Gross Weight (kg)",      value=1700.0, step=50.0)
-        erwltp = st.number_input("Emission Reduction (g/km)", value=1.56, step=0.1)
+        ep     = st.number_input("Engine Power (KW)",         value=110.0,  step=10.0)
+        mt     = st.number_input("Gross Weight (kg)",         value=1700.0, step=50.0)
+        erwltp = st.number_input("Emission Reduction (g/km)", value=1.56,   step=0.1)
 
+        # Restored full dictionary
         fm_map = {
             "Standard (M)":       "M",
             "Pure Electric (E)":  "E",
@@ -156,11 +97,11 @@ with left_panel:
         fm_choice = st.selectbox("Drive Mode", options=list(fm_map.keys()))
         fm = fm_map[fm_choice]
 
-    st.markdown(
-        "<h5 style='color:#9ca3af; margin-top:15px;'>🔋 Battery Details (If Applicable)</h5>",
-        unsafe_allow_html=True,
-    )
+    # ── Restored Battery Details Section ──
+    st.markdown("<h5 style='color:#9ca3af; margin-top:15px;'>🔋 Battery Details (If Applicable)</h5>", unsafe_allow_html=True)
     c3, c4 = st.columns(2, gap="medium")
+    
+    # Logic to enable/disable based on fuel type
     is_electric = ft in ["electric", "petrol/electric", "diesel/electric"]
 
     with c3:
@@ -176,15 +117,12 @@ with left_panel:
             disabled=not is_electric,
         )
 
-
-# Results Panel
+# ── Results Panel ──
 with right_panel:
-    st.markdown(
-        "<h4 style='color:#e2e8f0; text-align:center; margin-bottom:25px;'>📊 Results Area</h4>",
-        unsafe_allow_html=True,
-    )
+    st.markdown("<h4 style='color:#e2e8f0; text-align:center; margin-bottom:25px;'>📊 Results Area</h4>", unsafe_allow_html=True)
 
     if st.button("🚀 Calculate Mileage"):
+        # Payload ab dynamically values lega battery se
         payload = {
             "ec": ec, "m_kg": m_kg, "ewltp": ewltp, "ft": ft,
             "ep": ep, "mt": mt,    "erwltp": erwltp, "fm": fm,
@@ -192,12 +130,7 @@ with right_panel:
         }
 
         try:
-            # FIX: timeout=10 streamlit wont get froze   before backend starts
-            response = requests.post(
-                f"{API_URL}/predict",
-                json=payload,
-                timeout=10,
-            )
+            response = requests.post(f"{API_URL}/predict", json=payload, timeout=30)
 
             if response.status_code == 200:
                 display_text = response.json()["result_text"]
@@ -218,19 +151,14 @@ with right_panel:
                 st.balloons()
 
             elif response.status_code == 400:
-                # wrong user input
                 st.error(f"⚠️ Input Error: {response.json().get('detail', response.text)}")
-
             else:
                 st.error(f"🔴 Server Error ({response.status_code}): {response.text}")
 
-        except requests.exceptions.Timeout:
-            st.error("⏱️ Request timeout — backend respond nahi kar raha. Dobara try karo.")
         except requests.exceptions.ConnectionError:
-            st.error("⚠️ Backend se connection nahi hua! App restart karo.")
+            st.error("⚠️ Backend se connection toot gaya! Make sure run.py is running.")
 
     else:
-        # Default placeholder
         st.markdown("""
             <div class="prediction-card" style="border-style:dashed;">
                 <h4 style="color:#5e6278; margin-bottom:10px; font-weight:normal;">
