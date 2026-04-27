@@ -7,8 +7,20 @@ API_URL = "http://127.0.0.1:8000"
 
 def wait_for_backend(max_retries=30):
     """
-    Blind sleep ki jagah /health poll karo with a timeout.
-    Agar 30 second tak backend chalu nahi hua, toh script band kar do.
+    Actively polls the FastAPI '/health' endpoint to verify server readiness.
+
+    Replaces unreliable static sleep delays with a dynamic polling mechanism. 
+    This ensures that dependent services (e.g., the Streamlit frontend) only 
+    initialize after the backend ML models and API routes are fully loaded 
+    and operational.
+
+    Args:
+        max_retries (int, optional): Maximum number of polling attempts 
+                                     (1 attempt per second). Defaults to 30.
+
+    Returns:
+        bool: True if the backend responds with HTTP 200 within the retry limit, 
+              False if the connection times out and maximum retries are exhausted.
     """
     print("   Waiting for backend to be ready...", end="", flush=True)
     retries = 0
@@ -20,7 +32,7 @@ def wait_for_backend(max_retries=30):
         except requests.exceptions.ConnectionError:
             print(".", end="", flush=True)
             time.sleep(1)
-            retries += 1
+            retries += 1 
             
     print("\n❌ Error: Backend failed to start after 30 seconds. Check api.py for errors.")
     return False

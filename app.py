@@ -133,7 +133,15 @@ with right_panel:
             response = requests.post(f"{API_URL}/predict", json=payload, timeout=30)
 
             if response.status_code == 200:
-                display_text = response.json()["result_text"]
+                # 1. Poora JSON object uthao
+                resp_data = response.json()
+                display_text = resp_data["result_text"]
+                
+                # 2. Naye fields nikalo (with fallback safety)
+                mod_version = resp_data.get("model_version", "Unknown")
+                api_status = resp_data.get("status", "OK").capitalize()
+
+                # 3. HTML string ko update karo taaki version aur status dikhe
                 st.markdown(f"""
                     <div class="prediction-card">
                         <h4 style="color:#9ca3af; margin-bottom:10px; font-weight:normal;">
@@ -144,7 +152,7 @@ with right_panel:
                             {display_text}
                         </h1>
                         <p style="color:gray; font-size:0.9rem; margin-top:15px;">
-                            Based on ML prediction
+                            🧠 Model: {mod_version} | 🟢 Status: {api_status}
                         </p>
                     </div>
                 """, unsafe_allow_html=True)
