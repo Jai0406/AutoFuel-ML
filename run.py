@@ -41,7 +41,7 @@ def main():
     print("\n🚀 Starting FastAPI backend on port 8000...")
     backend_proc = subprocess.Popen(
         [sys.executable, "-m", "uvicorn", "api:app",
-         "--host", "127.0.0.1", "--port", "8000",
+         "--host", "0.0.0.0", "--port", "8000",
          "--log-level", "warning"], 
     )
 
@@ -49,7 +49,7 @@ def main():
     if wait_for_backend():
         print("Starting Streamlit frontend...\n")
         frontend_proc = subprocess.Popen(
-            [sys.executable, "-m", "streamlit", "run", "app.py"]
+            [sys.executable, "-m", "streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
         )
 
         try:
@@ -62,7 +62,6 @@ def main():
             backend_proc.wait()
             print("✅ Done.")
     else:
-        # Agar backend fail hua toh process ko kill kar do
         backend_proc.terminate()
         sys.exit(1)
 
